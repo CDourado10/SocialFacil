@@ -6,12 +6,12 @@ from icrawler.builtin import GoogleImageCrawler
 import pytesseract
 import cv2
 from unidecode import unidecode
-from CJ_Imagem_Download import *
-from CJ_Imagem_Escrever import *
+from SF_Imagem_Download import *
+from SF_Imagem_Escrever import *
 import re
 import urllib.parse
 import unidecode
-from CJ_Imagem_Corte import *
+from SF_Imagem_Corte import *
 
 def buscar_imagem_por_descricao(titulo, descricao, imagens_baixadas, pastaimagem, startin=0):
     save_dir = f'{pastaimagem}/{descricao}/'

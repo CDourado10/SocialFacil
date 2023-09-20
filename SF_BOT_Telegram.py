@@ -1,8 +1,8 @@
 import telebot
-from CJ_Gerador_1 import *
-from CJ_Gerador_2 import *
-from CJ_Insta_Post import *
-from CJ_Telegram_Functions import *
+from SF_Gerador_1 import *
+from SF_Gerador_2 import *
+from SF_Insta_Post import *
+from SF_Telegram_Functions import *
 from telebot.types import *
 
 # Substitua pelo seu token de acesso real

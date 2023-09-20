@@ -1,0 +1,14 @@
+# Use a imagem Python oficial como base
+FROM python:latest
+
+# Defina o diretório de trabalho
+WORKDIR /SocialFacil
+
+# Copie os arquivos do projeto para o contêiner
+COPY . .
+
+# Instale as dependências
+RUN pip install -r requirements.txt
+
+# Configure o comando de entrada
+CMD ["python", "app.py"]

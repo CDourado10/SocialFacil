@@ -1,9 +1,9 @@
-from CJ_Noticias import *
-from CJ_LOG import *
-from CJ_AI import  *
-from CJ_Tratamento_INFO import *
-from CJ_Imagem_Builder import *
-from CJ_FakeNews import *
+from SF_Noticias import *
+from SF_LOG import *
+from SF_AI import  *
+from SF_Tratamento_INFO import *
+from SF_Imagem_Builder import *
+from SF_FakeNews import *
 import time
 import os
 import shutil

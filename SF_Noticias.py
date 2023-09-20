@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lxml import html
-from CJ_Noticias_GET import *
+from SF_Noticias_GET import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait

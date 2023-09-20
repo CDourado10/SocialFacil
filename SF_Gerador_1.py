@@ -1,5 +1,5 @@
-from CJ_Noticias import *
-from CJ_LOG import *
+from SF_Noticias import *
+from SF_LOG import *
 import os
 import time
 

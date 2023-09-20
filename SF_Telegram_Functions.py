@@ -1,4 +1,4 @@
-from CJ_Gerador_1 import *
+from SF_Gerador_1 import *
 
 def Prompt_Gerador1(prompt):
     parametros = {"qntmax": "5", "tempo": "", "provedores": "", "assunto": ""}
