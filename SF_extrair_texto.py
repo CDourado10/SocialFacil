@@ -9,8 +9,6 @@ from difflib import SequenceMatcher
 from SF_AI import *
 
 
-link = 'https://veja.abril.com.br/saude/a-saude-climatica-e-a-humana-andam-de-maos-dadas'
-
         
 def acessar_links(link):
     conteudos = []
@@ -147,10 +145,6 @@ def extrair_texto(link):
     resumo_gpt = f'Faça um texto grande para postagem em um blog, sobre o seguinte assunto:\n\n{texto_entre_repeticoes}'
 
 
-    resumo_gpt = chatgpt(resumo_gpt, 1)
+    resumo_gpt = chatgpt(resumo_gpt)
 
     return resumo_gpt
-
-
-
-    
