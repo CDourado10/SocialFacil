@@ -1,21 +1,18 @@
 # Use a imagem Python oficial como base
-FROM python:latest
+FROM python:3.11.5
 
-# Atualize o sistema
-RUN apt-get update && apt-get upgrade -y
-
-# Instale o Tesseract OCR (Linux)
-RUN apt-get install -y tesseract-ocr
-RUN apt-get install -y tesseract-ocr-por
+# Atualize o sistema e instale as dependências
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr tesseract-ocr-por \
+    libgl1-mesa-glx \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
 # Defina o diretório de trabalho
 WORKDIR /SocialFacil
 
-# Copie os arquivos do projeto para o contêiner
-COPY ./Bot\Telegram\* ./
+# Copie o arquivo requirements.txt para o contêiner
+COPY requirements.txt ./
 
 # Instale as dependências
 RUN pip install -r requirements.txt
-
-# Configure o comando de entrada
-CMD ["python", "SocialFacil.py"]

@@ -148,3 +148,7 @@ def extrair_texto(link):
     resumo_gpt = chatgpt(resumo_gpt)
 
     return resumo_gpt
+
+if __name__ == "__main__":
+    link = 'https://g1.globo.com/politica/noticia/2023/09/15/lula-chega-a-cuba-para-encontro-do-grupo-g77-e-a-china.ghtml'
+    print(extrair_texto(link))

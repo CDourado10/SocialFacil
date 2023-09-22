@@ -6,10 +6,10 @@ from SF_Telegram_Functions import *
 from telebot.types import *
 
 # Substitua pelo seu token de acesso real
-TOKEN = "6491794670:AAHWsszKn8ry1y1ENtAicAGjyFOME-FC4DY"
+TOKEN = "6632901248:AAGCaSyfP5GsYas23Dt7aXvuhVOXY28y9n4"
 
 # Substitua pelo seu ID de usuário
-SEU_ID_USUARIO = 968616242
+SEU_ID_USUARIO = 1636508473
 
 # Configurar o bot do Telegram
 bot = telebot.TeleBot(TOKEN)

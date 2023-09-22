@@ -38,10 +38,10 @@ def limpar_itens_do_diretorio():
     except Exception as e:
         print(f"Erro ao remover conteúdo de '{Pasta}': {str(e)}")
 
-
-
 def GerarNoticia(noticia, listadenoticia):
+    print("Limpando diretório de imagens")
     limpar_itens_do_diretorio()
+    print("Extraindo texto da notícia original")
     Provedor, Noticia_Texto = get_news_by_title_and_provider(noticia, listadenoticia)
     BardPrompt = (f"{Noticia_Texto}\n\n"
         "Resuma essa notícia para um post de um portal de notícias de Direito do Instagram, seguindo o modelo:\n"
@@ -54,6 +54,7 @@ def GerarNoticia(noticia, listadenoticia):
     tentativas = 0
     noticiavalidada = False
     while tentativas < 11:
+        print(f"Tentativa de geração de notícia: {tentativas}")
         NoticiaCriada = bard_chamada(BardPrompt)
         if "TÍTULO" in NoticiaCriada.upper() or "TITULO" in NoticiaCriada.upper():
             NoticiaFormatadaInput = NoticiaCriada.replace("*", "")
@@ -65,18 +66,22 @@ def GerarNoticia(noticia, listadenoticia):
             #if "VERDADEIRO" in VerificarNoticia.upper():
             if VerificarNoticia == True:
                 noticiavalidada = True
+                print("Notícia aprovada")
                 break
             else:
                 tentativas += 1
+                print("Notícia reprovada")
     if noticiavalidada != True:
         return None
 
+    print("Produzindo imagem")
     Imagemloc = imagebuilder(NoticiaFormatada[chaves[0]], noticia ,Pasta, Modelo)
 
+    print("Adicionando ao Log")
     add_to_log(noticia, log_caminho)
     NoticiaFormatada[chaves[4]] = NoticiaFormatada[chaves[4]].replace('\n', '')
     TextoPost = f"{NoticiaFormatada[chaves[0]]}\n\n{NoticiaFormatada[chaves[2]]}\n\n{NoticiaFormatada[chaves[4]]}\n\nFonte: {Provedor}"
-    
+    print("Retornando")
     return(TextoPost, Imagemloc)
 
 if __name__ == "__main__":
