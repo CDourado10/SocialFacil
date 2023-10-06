@@ -1,52 +1,56 @@
-from requests_html import HTMLSession
-from pyppeteer import launch
-import asyncio
+import requests
+import json
+
+def request_fakenews(texto):
+    # URL da solicitação POST
+    url = "http://nilc-fakenews.herokuapp.com/ajax/check_web/"
+
+    # Dados para enviar na solicitação POST
+    data = {
+        "text": texto,
+        "model": "unigramas"  # Você pode ajustar o valor do modelo conforme necessário
+    }
+
+    # Cabeçalhos da solicitação
+    headers = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        "Connection": "keep-alive",
+        "Content-Length": str(len(data)),
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Cookie": "csrftoken=K6F3j5BcHaKbl3ltjdl6A2NLhFJyHNiB62Cm1sJACeBzLJWfPdxNKKDB1HxNKqoN",
+        "Host": "nilc-fakenews.herokuapp.com",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0.2045.47",
+        "X-Csrftoken": "K6F3j5BcHaKbl3ltjdl6A2NLhFJyHNiB62Cm1sJACeBzLJWfPdxNKKDB1HxNKqoN",
+        "X-Requested-With": "XMLHttpRequest"
+    }
+
+    try:
+        # Envia a solicitação POST
+        response = requests.post(url, data=data, headers=headers)
+
+        # Verifica se a solicitação foi bem-sucedida (código de status 200)
+        if response.status_code == 200:
+            return response.text  # Retorna a resposta do servidor
+        else:
+            return f"Erro na solicitação: Código de status {response.status_code}"
+    except Exception as e:
+        return f"Erro na solicitação: {str(e)}"
 
 def is_TrueNews(texto):
-    async def TrueFunction():
-        url = 'http://nilc-fakenews.herokuapp.com/'
-        # Inicializa uma sessão HTTP com requests-html
-        session = HTMLSession()
-
-        # Inicializa o navegador Chromium com pyppeteer
-        browser = await launch()
-        page = await browser.newPage()
-
-        # Define as informações de cabeçalho e cookies
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
-        }
-        # Define as opções do navegador, incluindo cabeçalho e cookies
-        await page.setExtraHTTPHeaders(headers)
-
-        # Vai para a página da web
-        await page.goto(url)
-
-        # Preenche o campo de texto com o texto da notícia
-        await page.type('#news', texto)
-
-        # Clica no botão de envio
-        await page.click('#send')
-
-        # Aguarda um tempo para a página processar
-        await asyncio.sleep(5)
-
-        # Obtém o resultado da página após o processamento
-        resultado = await page.evaluate('document.querySelector("#answer").textContent')
-        await browser.close()
-        return(resultado)
-
-    resultadoTrueFunction = asyncio.run(TrueFunction())
-    if "VERDADEIRA" in resultadoTrueFunction.upper():
-        return True
+    resposta = json.loads(request_fakenews(texto))
+    if "result" in resposta:
+        if resposta["result"] == "REAL":
+            return True
+        else:
+            return False
     else:
-        return False
-        # Fecha o navegador
+        return resposta
 
 
 if __name__ == "__main__":
 # Exemplo de uso da função
-    url_da_pagina = 'http://nilc-fakenews.herokuapp.com/'
     texto_da_noticia = """Era uma vez, em um Brasil fictício onde a política tomava rumos inesperados, que o ex-presidente Luiz Inácio Lula da Silva e o ex-presidente Jair Bolsonaro, dois políticos que representavam espectros políticos opostos, surpreenderam o país ao anunciarem um evento inusitado: um casamento de Natal no mês de janeiro.
 
 A notícia da união de Lula e Bolsonaro pegou a todos de surpresa, mas a explicação era mais simples do que se poderia imaginar. Os ex-presidentes decidiram deixar para trás suas rivalidades políticas e optaram por uma aliança pessoal. Eles se conheceram melhor durante uma conferência internacional sobre mudanças climáticas e descobriram que tinham muito em comum, além das diferenças ideológicas que os separavam.
