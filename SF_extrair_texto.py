@@ -1,12 +1,14 @@
-import json
-import os
 import requests
+import asyncio
 from bs4 import BeautifulSoup
-from lxml import html
-from urllib.request import Request, urlopen
 import re
-from difflib import SequenceMatcher
-from SF_AI import *
+from SF_AI import chatgpt
+from SF_Info_User import *
+import logging
+from SF_prompts import noticias_maior, artigo_atual_maior, artigo_atemporal_maior
+
+# Configurar o logger
+logging.basicConfig(filename='SF_extrair_texto_erros.log', level=logging.ERROR)
 
 
         
@@ -22,6 +24,20 @@ def acessar_links(link):
 
     
     try:
+        if 'news.google' in link:
+            response_google_news = requests.get(link, headers=headers, timeout=30)
+            response_google_news.raise_for_status()  # Verifica se a solicitação foi bem-sucedida
+
+            # Analisa o HTML da página
+            soup_1 = BeautifulSoup(response_google_news.text, 'html.parser')
+            # Encontre o elemento que contém o link do site verdadeiro
+            elemnt = soup_1.find('a', {'jsname': 'tljFtd'})
+
+            # Verifique se o elemento foi encontrado
+            if elemnt:
+                # Extraia o link do atributo "href"
+                link = elemnt.get('href')
+        
         response = requests.get(link, headers=headers, timeout=30)
         response.raise_for_status()  # Verifica se a solicitação foi bem-sucedida
 
@@ -50,18 +66,18 @@ def acessar_links(link):
                 'conteudo': conteudo_artigo
             })
         else:
-            print(f"Nenhum elemento com as classes desejadas em {link}")
+            logging.error(f"Nenhum elemento com as classes desejadas em {link}")
 
 
     except requests.exceptions.RequestException as e:
-        print(f"Erro ao acessar o link {link}: {e}")
+        logging.error(f"Erro ao acessar o link {link}: {e}")
     except Exception as e:
-        print(f"Erro ao processar o link {link}: {e}")
+        logging.error(f"Erro ao processar o link {link}: {e}")
 
     return conteudos
 
 
-def extrair_texto(link):    
+def extrair_texto(link, area, tema, subtema,  assunto):    
     # Chamada da função
     conteudos = acessar_links(link)
     
@@ -142,13 +158,20 @@ def extrair_texto(link):
         else:
             texto_entre_repeticoes = linhas
 
-    resumo_gpt = f'Faça um texto grande para postagem em um blog, sobre o seguinte assunto:\n\n{texto_entre_repeticoes}'
+    'noticias_maior(tema, texto, entonacao), artigo_atual_maior(entonacao, tema, subtema, texto), artigo_atemporal_maior(entonacao, tema, subtema, assunto)'
+    if  area == 'noticias':
+        prompt = f'Escreva um artigo grande para postagem em um blog sobre {tema}, cite a fonte da informação se houver, sobre o seguinte assunto:\n\n{texto_entre_repeticoes}'
+    
+    else:
+        prompt = f'Escreva um artigo grande para postagem em um blog sobre {tema}, relacionando uma aplicação prática de {subtema} ao assunto central do seguinte texto:\n\n{texto_entre_repeticoes}'
+    
 
 
-    resumo_gpt = chatgpt(resumo_gpt)
+    resumo_gpt = asyncio.run(chatgpt(prompt))
 
     return resumo_gpt
 
 if __name__ == "__main__":
-    link = 'https://g1.globo.com/politica/noticia/2023/09/15/lula-chega-a-cuba-para-encontro-do-grupo-g77-e-a-china.ghtml'
+    #link = 'https://news.google.com/./articles/CBMikgFodHRwczovL3d3dzEuZm9saGEudW9sLmNvbS5ici9jb3RpZGlhbm8vMjAyMy8wOS9jb20tb25kYS1kZS1jYWxvci1tYWlvcmlhLWRhcy1jYXBpdGFpcy1kZXZlLXJlZ2lzdHJhci1tYWlzLWRlLTMwMGMtbmVzdGEtc2V4dGEtdmVqYS1wcmV2aXNhby5zaHRtbNIBlgFodHRwczovL3d3dzEuZm9saGEudW9sLmNvbS5ici9hbXAvY290aWRpYW5vLzIwMjMvMDkvY29tLW9uZGEtZGUtY2Fsb3ItbWFpb3JpYS1kYXMtY2FwaXRhaXMtZGV2ZS1yZWdpc3RyYXItbWFpcy1kZS0zMDBjLW5lc3RhLXNleHRhLXZlamEtcHJldmlzYW8uc2h0bWw?hl=pt-BR&gl=BR&ceid=BR%3Apt-419'
+    link = 'https://portaldobitcoin.uol.com.br/microstrategy-compra-mais-r-730-milhoes-em-bitcoin/'
     print(extrair_texto(link))

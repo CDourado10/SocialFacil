@@ -2,30 +2,27 @@ import requests
 from bs4 import BeautifulSoup
 from lxml import html
 import urllib.parse
+from SF_sites_dict import *
 
 
-def get_from_google_news(provedor="Folha", qntmax=10, assunto="", tempo="1d"):
+def get_from_google_news(provedor="Folha", qntmax=10, assunto="", tempo="1d", sites={}):
+
+    # Verificar se o provedor existe nos sites
+    provedor_info = None
+    for area in sites.values():
+        for categoria in area.values():
+            if provedor in categoria:
+                provedor_info = categoria[provedor]
+                break
+        if provedor_info:
+            break
     
-    if provedor == "Folha":
-        site = "www1.folha.uol.com.br"
-        srcset = "UOL"
-    elif provedor == "G1":
-        site = "g1.globo.com"
-        srcset = "G1"
-    elif provedor == "Senado":
-        site = "www12.senado.leg.br"
-        srcset = "senado"
-    elif provedor == "STJ":
-        site = "stj.jus.br"
-        srcset = "stj.jus.br"
-    elif provedor == "Migalhas":
-        site = "www.migalhas.com.br"
-        srcset = "Migalhas"
-    elif provedor == "JOTA":
-        site = "jota.info"
-        srcset = "JOTA"
+    if provedor_info:
+        # Extrair as informações de site e srcset
+        site = provedor_info['site']
+        srcset = provedor_info['srcset']
 
-    parametros = f"{site}{f' {assunto}' if assunto != '' else ''}{f' when:{tempo}' if tempo != '' else ''}"
+    parametros = f"{site if site else ''}{f' {assunto}' if assunto != '' else ''}{f' when:{tempo}' if tempo != '' else ''}"
     parametros = urllib.parse.quote(parametros)
     link = f"https://news.google.com/search?q={parametros}&hl=pt-BR&gl=BR&ceid=BR%3Apt-419"
     # Faça a solicitação HTTP
@@ -91,7 +88,7 @@ def get_from_senado(qntmax=10):
 
 
 if __name__ == "__main__":
-    resultados = get_from_google_news(provedor="jota", qntmax=10, assunto="", tempo="")
+    resultados = get_from_google_news(provedor="JOTA", qntmax=10, assunto="", tempo="")
     for resultado in resultados:
         print(resultado)
 

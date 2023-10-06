@@ -23,3 +23,14 @@ def Prompt_Gerador1(prompt):
     print(f'qntmax={parametros["qntmax"]}, assunto={parametros["assunto"]}, tempo={parametros["tempo"]}, provedores={parametros["provedores"]}')
     resultado = Lista_Noticias(qntmax=parametros["qntmax"], assunto=parametros["assunto"], tempo=parametros["tempo"], provedores=parametros["provedores"])
     return(resultado)
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    prompt = '/post'
+    resultado = Prompt_Gerador1(prompt)
+    print(resultado)

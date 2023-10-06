@@ -1,0 +1,2 @@
+[console_scripts]
+g4f = interference.app:main

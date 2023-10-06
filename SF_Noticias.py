@@ -2,18 +2,43 @@ import requests
 from bs4 import BeautifulSoup
 from lxml import html
 from SF_Noticias_GET import *
+from SF_sites_dict import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def news_list_mother(qntmax=10, assunto="", tempo="1d", provedores=""):
-    provedoresaceitos = {"G1", "Folha", "Senado", "JOTA", "STJ", "Migalhas"}
-    provedores = set(provedor.upper() for provedor in provedores.split(", ")) if provedores else set(provedor.upper() for provedor in provedoresaceitos)
-    provedoressolicitados = [provedor for provedor in provedoresaceitos if provedor.upper() in provedores]
+def news_list_mother(qntmax=10, assunto="", tempo="1d", provedores="", user_atuacao=['Direito'], user_atuacao_especifica = ['Notícias']):
+    # Obter informações dos sites
+    sites = buscar_sites()
+    
+    # Coletar todos os provedores aceitos
+    todos_provedores = [provedor for area in sites.values() for categoria in area.values() for provedor in categoria.keys()]
+    provedoresaceitos = set(todos_provedores)
+    
+    # Filtrar os provedores com base na área de atuação geral do usuário
+    if not provedores:
+        if user_atuacao:
+            provedores = set()
+            for area in user_atuacao:
+                provedores |= {provedor.upper() for provedor in provedoresaceitos if provedor in {provedor for categoria in sites.get(area, {}).values() for provedor in categoria.keys()}}
+        else:
+            provedores = set(provedor.upper() for provedor in provedoresaceitos)
+
+        # Filtrar os provedores específicos da categoria 'user_atuacao_especifica' se especificado
+        provedores_especificos = set()
+        for area in user_atuacao_especifica:
+            for area_geral in user_atuacao:
+                provedores_especificos |= {provedor.upper() for provedor in provedoresaceitos if provedor in sites.get(area_geral, {}).get(area, {}).keys()} if user_atuacao_especifica else provedores
+    
+    else:
+        provedores = set(provedor.upper() for provedor in provedores.split(", "))
+
+    # Determinar quais provedores usar com base na área específica do usuário
+    provedoressolicitados = [provedor for provedor in provedoresaceitos if provedor.upper() in provedores] if not user_atuacao_especifica else [provedor for provedor in provedoresaceitos if provedor.upper() in provedores_especificos]
     combined_news = []
     for provedor in provedoressolicitados:
-        getfrom = get_from_google_news(provedor=provedor, qntmax=qntmax, assunto=assunto, tempo=tempo)
+        getfrom = get_from_google_news(provedor=provedor, qntmax=qntmax, assunto=assunto, tempo=tempo, sites=sites)
         for noticia in getfrom:
             combined_news.append(noticia)
     return combined_news
@@ -167,4 +192,5 @@ def atualizar_lista(listanoticias, listajson):
 if __name__ == "__main__":
     migalhas_link = 'https://www.stj.jus.br/sites/portalp/Paginas/Comunicacao/Noticias/2023/17092023-Interpretacoes-do-STJ-sobre-o-instituto-da-interdicao-.aspx'
     migalhas_news = get_stj_news(migalhas_link)
-    print(migalhas_news)
+    noticias_combinadas = news_list_mother()
+    print(noticias_combinadas)

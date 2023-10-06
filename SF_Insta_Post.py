@@ -1,16 +1,16 @@
 import requests
 from imgur_uploader import *
 
-ACCESS_TOKEN = "EAASYFdP2xJIBO4zSJTrM02XGZAYX7lHHPqqLN6LSdkTR4ZAI7dFgMQYZBKliPtclKV45J0ZCwJySopiZAzduH2JxZCu4WV07xldSePzpunpop05qGtC5uKDXbpdcuX4PJdSHY3d771ygiwzt2ZBlSl0oVwBHHmTiVwPzZAbZBLKIEikhC4VSRwh9wu5MxtedPSx5ZC"
 
-def InstaUpload(image_path, LEGENDA):
+
+def InstaUpload(image_path, LEGENDA, ID_instagram_business_account, ACCESS_TOKEN):
     #Fazendo upload ao Imgur
     uploader = ImgurClient(client_id="65e21235564102c", client_secret="131e60768f3c04e9b1fc107c7bbda6499c3bd852")
     result = uploader.upload_from_path(image_path)
     
     URL_IMAGE = result["link"]
 
-    url = f"https://graph.facebook.com/v18.0/17841461836840074/media"
+    url = f"https://graph.facebook.com/v18.0/{ID_instagram_business_account}/media"
 
     # Crie os parâmetros da solicitação
     params = {
@@ -30,7 +30,7 @@ def InstaUpload(image_path, LEGENDA):
         
         # Agora você pode usar o creation_id na segunda solicitação
         # Construa a URL da segunda solicitação
-        url_publish = f"https://graph.facebook.com/v18.0/17841461836840074/media_publish"
+        url_publish = f"https://graph.facebook.com/v18.0/{ID_instagram_business_account}/media_publish"
         
         # Crie os parâmetros da segunda solicitação
         params_publish = {
